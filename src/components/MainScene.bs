@@ -27,9 +27,8 @@ sub init()
     displaySlide()
 end sub
 
-' Create twelve Undertale slides with poster URIs and texts.
-sub createSlides()    
-    ' TODO: Update size of the array to 12 and set each of the remaining slides
+' Creates twelve Undertale slides with poster URIs and texts.
+sub createSlides()
     m.slides = createObject("roArray", 12, false)
     m.slides[0] = Slide("pkg:/images/image-00.png", "Long ago, two races", "ruled over Earth:", "HUMANS and MONSTERS.")
     m.slides[1] = Slide("pkg:/images/image-01.png", "One day, war broke", "out between the two", "races.")
@@ -45,6 +44,7 @@ sub createSlides()
     m.slides[11] = Slide("pkg:/images/image-11.png", "", "", "")
 end sub
 
+' Sets default values for the background, page numbering and buttons.
 sub setSlidesDefaults()
     m.top.backgroundColor = "0x000000FF"
     m.top.backgroundURI = ""
@@ -59,7 +59,7 @@ sub setSlidesDefaults()
     button.observeField("buttonSelected", "onOkOnButton", button)
 end sub
 
-' Display slide with specified page number
+' Displays slide with specified page number.
 sub displaySlide()
     poster = m.top.findNode("slidePoster")
     poster.uri = m.slides[m.currentPageNumber].posterUri
@@ -91,12 +91,14 @@ sub displaySlide()
     label.text = `${m.currentPageNumber + 1}/${m.slides.count()}`
 end sub
 
-function isValidKeyEventOnCurrentPage(key as String) as Boolean
+' Returns if a key event could have an effect based on the current page number and the focused button.
+function isValidKeyEvent(key as String) as Boolean
     if (key = RemoteButton.ok) return true
     if (m.currentPageNumber = 0 or m.currentPageNumber = m.slides.count() - 1) return false
     return m.currentButton = SlideButton.next and key = RemoteButton.rewind or m.currentButton = SlideButton.previous and key = RemoteButton.fastForward
 end function
 
+' Receives OK event over a focused button.
 sub onOkOnButton(button)
     m.currentPageNumber = m.currentPageNumber + (m.currentButton = SlideButton.next ? 1 : -1)
 
@@ -112,10 +114,11 @@ sub onOkOnButton(button)
     displaySlide()
 end sub
 
+' Receives remote control key events from the Roku OS.
 function onKeyEvent(key as String, press as Boolean) as Boolean
     if (not press) return false
     
-    if (not isValidKeyEventOnCurrentPage(key)) return false
+    if (not isValidKeyEvent(key)) return false
     
     if (key = RemoteButton.ok)
         m.currentPageNumber = m.currentPageNumber + (m.currentButton = SlideButton.next ? 1 : -1)
