@@ -14,6 +14,8 @@ enum RemoteButton
     ok = "OK"
     rewind = "rewind"
     fastForward = "fastforward"
+    left = "left"
+    right = "right"
 end enum
 
 enum SlideButton
@@ -95,7 +97,7 @@ end sub
 function isValidKeyEvent(key as String) as Boolean
     if (key = RemoteButton.ok) return true
     if (m.currentPageNumber = 0 or m.currentPageNumber = m.slides.count() - 1) return false
-    return m.currentButton = SlideButton.next and key = RemoteButton.rewind or m.currentButton = SlideButton.previous and key = RemoteButton.fastForward
+    return m.currentButton = SlideButton.next and key = RemoteButton.left or m.currentButton = SlideButton.previous and key = RemoteButton.right
 end function
 
 ' Receives OK event over a focused button.
@@ -123,7 +125,7 @@ function onKeyEvent(key as String, press as Boolean) as Boolean
     if (key = RemoteButton.ok)
         m.currentPageNumber = m.currentPageNumber + (m.currentButton = SlideButton.next ? 1 : -1)
     else
-        m.currentButton = (key = RemoteButton.rewind ? SlideButton.previous : SlideButton.next)
+        m.currentButton = (key = RemoteButton.left ? SlideButton.previous : SlideButton.next)
     end if
 
     if (m.currentPageNumber = 0)
