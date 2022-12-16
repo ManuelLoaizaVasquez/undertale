@@ -1,0 +1,13 @@
+{
+    "private": true,
+    "version": "0.0.1",
+    "dependencies": {},
+    "devDependencies": {
+        "brighterscript": "^0.61.1"
+    },
+    "scripts": {
+        "prebuild": "rm -rf dist",
+        "build": "bsc",
+        "build:prod": "npm run build -- --sourceMap=false"
+    }
+}

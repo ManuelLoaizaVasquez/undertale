@@ -1,0 +1,136 @@
+class Slide
+    posterUri = invalid
+    text = invalid
+    sub new(posterUri as String, firstTextSentence as String, secondTextSentence as String, thirdTextSentence as String)
+        m.posterUri = posterUri ?? ""
+        m.text = createObject("roArray", 3, false)
+        m.text[0] = firstTextSentence ?? ""
+        m.text[1] = secondTextSentence ?? ""
+        m.text[2] = thirdTextSentence ?? ""
+    end sub
+end class
+
+enum RemoteButton
+    ok = "OK"
+    rewind = "rewind"
+    fastForward = "fastforward"
+end enum
+
+enum SlideButton
+    previous = "previous"
+    next = "next"
+end enum
+
+sub init()
+    createSlides()
+    setSlidesDefaults()
+    displaySlide()
+end sub
+
+' Create twelve Undertale slides with poster URIs and texts.
+sub createSlides()    
+    ' TODO: Update size of the array to 12 and set each of the remaining slides
+    m.slides = createObject("roArray", 12, false)
+    m.slides[0] = Slide("pkg:/images/image-00.png", "Long ago, two races", "ruled over Earth:", "HUMANS and MONSTERS.")
+    m.slides[1] = Slide("pkg:/images/image-01.png", "One day, war broke", "out between the two", "races.")
+    m.slides[2] = Slide("pkg:/images/image-02.png", "After a long battle,", "the humans were", "victorious.")
+    m.slides[3] = Slide("pkg:/images/image-02.png", "They sealed the monsters", "underground with a magic", "spell.")
+    m.slides[4] = Slide("", "Many years later...", "", "")
+    m.slides[5] = Slide("pkg:/images/image-05.png", "MT. EBOTT", "201X", "")
+    m.slides[6] = Slide("pkg:/images/image-06.png", "Legends say that those", "who climb the mountain", "never return.")
+    m.slides[7] = Slide("pkg:/images/image-07.png", "", "", "")
+    m.slides[8] = Slide("pkg:/images/image-08.png", "", "", "")
+    m.slides[9] = Slide("pkg:/images/image-09.png", "", "", "")
+    m.slides[10] = Slide("pkg:/images/image-10.png", "", "", "")
+    m.slides[11] = Slide("pkg:/images/image-11.png", "", "", "")
+end sub
+
+sub setSlidesDefaults()
+    m.top.backgroundColor = "0x000000FF"
+    m.top.backgroundURI = ""
+    m.currentPageNumber = 0
+    m.currentButton = SlideButton.next
+    button = m.top.findNode(m.currentButton)
+    button.setFocus(true)
+    
+    button = m.top.findNode(SlideButton.previous)
+    button.observeField("buttonSelected", "onOkOnButton", button)
+    button = m.top.findNode(SlideButton.next)
+    button.observeField("buttonSelected", "onOkOnButton", button)
+end sub
+
+' Display slide with specified page number
+sub displaySlide()
+    poster = m.top.findNode("slidePoster")
+    poster.uri = m.slides[m.currentPageNumber].posterUri
+
+    label = m.top.findNode("firstTextSentence")
+    label.text = m.slides[m.currentPageNumber].text[0]
+
+    label = m.top.findNode("secondTextSentence")
+    label.text = m.slides[m.currentPageNumber].text[1]
+
+    label = m.top.findNode("thirdTextSentence")
+    label.text = m.slides[m.currentPageNumber].text[2]
+
+    button = m.top.findNode(SlideButton.previous)
+    if (m.currentPageNumber = 0)
+        button.opacity = 0.5
+    else
+        button.opacity = 1
+    end if
+
+    button = m.top.findNode(SlideButton.next)
+    if (m.currentPageNumber = m.slides.count() - 1)
+        button.opacity = 0.5
+    else
+        button.opacity = 1
+    end if
+
+    label = m.top.findNode("pageNumbering")
+    label.text = `${m.currentPageNumber + 1}/${m.slides.count()}`
+end sub
+
+function isValidKeyEventOnCurrentPage(key as String) as Boolean
+    if (key = RemoteButton.ok) return true
+    if (m.currentPageNumber = 0 or m.currentPageNumber = m.slides.count() - 1) return false
+    return m.currentButton = SlideButton.next and key = RemoteButton.rewind or m.currentButton = SlideButton.previous and key = RemoteButton.fastForward
+end function
+
+sub onOkOnButton(button)
+    m.currentPageNumber = m.currentPageNumber + (m.currentButton = SlideButton.next ? 1 : -1)
+
+    if (m.currentPageNumber = 0)
+        m.currentButton = SlideButton.next
+    else if (m.currentPageNumber = m.slides.count() - 1)
+        m.currentButton = SlideButton.previous
+    end if
+
+    button = m.top.findNode(m.currentButton)
+    button.setFocus(true)
+
+    displaySlide()
+end sub
+
+function onKeyEvent(key as String, press as Boolean) as Boolean
+    if (not press) return false
+    
+    if (not isValidKeyEventOnCurrentPage(key)) return false
+    
+    if (key = RemoteButton.ok)
+        m.currentPageNumber = m.currentPageNumber + (m.currentButton = SlideButton.next ? 1 : -1)
+    else
+        m.currentButton = (key = RemoteButton.rewind ? SlideButton.previous : SlideButton.next)
+    end if
+
+    if (m.currentPageNumber = 0)
+        m.currentButton = SlideButton.next
+    else if (m.currentPageNumber = m.slides.count() - 1)
+        m.currentButton = SlideButton.previous
+    end if
+
+    button = m.top.findNode(m.currentButton)
+    button.setFocus(true)
+
+    displaySlide()
+end function

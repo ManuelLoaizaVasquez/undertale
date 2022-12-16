@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="MainScene" extends="Scene" xsi:noNamespaceSchemaLocation="https://devtools.web.roku.com/schema/RokuSceneGraph.xsd">
+    <script type="text/brightscript" uri="MainScene.bs" />
+    <children>
+        <Poster
+            id="slidePoster"
+            width="633"
+            height="338"
+            translation="[643, 202]"
+        />
+        <Label
+            id="firstTextSentence"
+            width="605"
+            height="58"
+            translation="[643, 619]"
+        />
+        <Label
+            id="secondTextSentence"
+            width="605"
+            height="58"
+            translation="[643, 677]"
+        />
+        <Label
+            id="thirdTextSentence"
+            width="605"
+            height="58"
+            translation="[643, 735]"
+        />
+        <Button
+            id="previous"
+            width="303"
+            height="105"
+            translation="[580, 892]"
+            text="Previous"
+            focusedIconUri=""
+        />
+        <Button
+            id="next"
+            width="303"
+            height="105"
+            translation="[1036, 892]"
+            text="Next"
+            focusedIconUri=""
+        />
+        <Label
+            id="pageNumbering"
+            translation="[1850, 1030]"
+        />
+    </children>
+</component>
